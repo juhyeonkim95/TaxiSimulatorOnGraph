@@ -115,9 +115,9 @@ def evaluate(city: City,
              load_model=None,
              export_result=True,
              save_folder='./result',
-             export_q_values=False,
+             export_q_value_image=False,
              original_G =None,
-             export_q_values_per=10,
+             export_q_value_image_per=10,
              verbose=True):
     '''
     Function for evaluation.
@@ -128,9 +128,9 @@ def evaluate(city: City,
     :param load_model: path to model data to load.
     :param export_result: whether to export test result.
     :param save_folder: path to create result log.
-    :param export_q_values: Visualize q values at each time step. This is only for real case.
+    :param export_q_value_image: Visualize q values at each time step. This is only for real case.
     :param original_G: Original road network graph. This is NOT a line graph conversed one.
-    :param export_q_values_per: Export q value images per.
+    :param export_q_value_image_per: Export q value images per.
     :return: mean and std of order response rate.
     '''
     total_assigned = []
@@ -175,7 +175,7 @@ def evaluate(city: City,
             policy = agent.get_policy(observations)
 
             # Export Q value images
-            if export_q_values and isinstance(agent, DQNAgent) and (i%export_q_values_per) == 0:
+            if export_q_value_image and isinstance(agent, DQNAgent) and (i % export_q_value_image_per) == 0:
                 q_values = agent.q_values.cpu().squeeze().tolist()
                 for edge in original_G.edges(data=True):
                     u, v, data = edge

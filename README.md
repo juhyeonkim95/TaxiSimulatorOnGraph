@@ -1,4 +1,5 @@
 # TaxiSimulatorOnGraph
+![teasure](assets/seoul.png)
 
 This repository is the official implementation of "Optimizing Large-Scale Fleet Management on a Road
 Network using Multi-Agent Deep Reinforcement
@@ -27,3 +28,11 @@ See the jupyter notebook code example for both training and evaluation.
 with large real data (`Tutorial_RealCity.ipynb`).
 - `Tutorial_RealCity.ipynb` runs simulation in Seoul with real call data. 
 As mentioned before, because data has not been uploaded, you cannot run this code right now.
+
+## Visualization
+
+You can export Q value of the road at each time stamp to SVG file by enabling `export_q_value_image` option in evaluation function.
+Following is the video that shows Q values of roads in Seoul at each time stamp in a single day.
+Note that red means higher value and green means lower value.
+
+![visualization](assets/teasure.gif)
