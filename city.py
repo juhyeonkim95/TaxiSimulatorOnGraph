@@ -15,7 +15,8 @@ class City:
                  driver_coefficient=0.5,
                  consider_speed=False,
                  verbose=False,
-                 after_action_random=True
+                 after_action_random=True,
+                 **kwargs
                  ):
         '''
         RL environment for road network.
@@ -260,7 +261,7 @@ class City:
             current_driver_number = len(self.drivers)
 
             number_to_add = expected_driver_number - current_driver_number
-            print("Expected: %d, real: %d" % (expected_driver_number, current_driver_number))
+            # print("Expected: %d, real: %d" % (expected_driver_number, current_driver_number))
 
             # remove
             if number_to_add < 0:

@@ -2,21 +2,26 @@
 ![teasure](assets/seoul.png)
 
 This repository is the official implementation of "Optimizing Large-Scale Fleet Management on a Road
-Network using Multi-Agent Deep Reinforcement
-Learning with Graph Neural Network". (preprint, work in progress)
+Network using Multi-Agent Deep Reinforcement Learning with Graph Neural Network" by Juhyeon Kim and Kihyun Kim (ITSC 2021 submitted).
+
 Because we use the company's data, we will disclose the data after consulting with the company.
 
 ## Requirements
 
 We use [Deep Graph Library](https://github.com/dmlc/dgl) (DGL)
-and [OSMnx](https://github.com/gboeing/osmnx)
-to handle road network.
+and [OSMnx](https://github.com/gboeing/osmnx) to handle road network.
 For backend of DGL, we use PyTorch.
 
 To install all of the requirements:
 
 ```setup
-pip install -r requirements.txt
+conda config --prepend channels conda-forge
+conda create -n roadnetwork --strict-channel-priority osmnx==0.14.1 python=3.7
+conda activate roadnetwork
+conda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch
+conda install -c anaconda ipykernel
+python -m ipykernel install --user --name=roadnetwork
+pip install dgl-cu102==0.4.3.post2
 ```
 
 ## Training and Evaluation

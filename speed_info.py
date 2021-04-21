@@ -11,8 +11,10 @@ class SpeedInfo:
         '''
         data = pd.read_csv(file_path, encoding='euc-kr')
         d = data.drop(columns=['일자', '링크아이디', '거리', '차선수']).groupby('도로명')
-        speed_mean = d.agg(['mean'])
-        speed_std = d.agg(['std'])
+        #print(data)
+        speed_mean = d.mean()#.agg(['mean', 'std'])
+        #print(speed_mean)
+        speed_std = d.std()#d.agg(['std'])
         road_names = speed_mean.index
 
         speed_mean = speed_mean.values

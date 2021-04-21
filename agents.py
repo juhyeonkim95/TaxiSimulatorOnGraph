@@ -6,11 +6,17 @@ from city import City
 from math_utils import softmax, softmax_pow
 from graph_utils import *
 
+POLICY_ARGMAX = 0
+POLICY_POW = 1
+POLICY_EXP = 2
+POLICY_ENTROPY = 3
 
 # class for different agent strategy
 class Agent:
     def __init__(self, name):
         self.name = name
+        self.do_epsilon_exploration = True
+        self.gamma = 0.9
 
     def train(self, next_observations):
         pass
@@ -37,14 +43,17 @@ class RandomAgent(Agent):
 
 
 class ProportionalAgent(Agent):
-    def __init__(self, city: City, proportional='order', policy_pow=1, strategy=1):
-        if strategy == 0:
-            t_name = 'proportional_max'
-        elif strategy == 1:
-            t_name = 'proportional_%.1f' % (policy_pow)
-        elif strategy == 2:
-            t_name = 'proportional_exp_%.3f' % (policy_pow)
+    def __init__(self, city: City, proportional='order', policy_pow=1, strategy=1,  **kwargs):
+        t_name = 'proportional'
+        temperature = kwargs.get("temperature", 1)
+        if strategy == POLICY_ARGMAX:
+            t_name = t_name + '_max_eps_%s' % (str(kwargs.get("epsilon_min", 0)))
+        elif strategy == POLICY_POW:
+            t_name = t_name + '_%s' % (str(policy_pow))
+        elif strategy == POLICY_EXP:
+            t_name = t_name + '_softmax_%s' % (str(temperature))
         super().__init__(t_name)
+
         self.city = city
         self.order_proportional = (proportional=='order')
         self.policy_pow = policy_pow
@@ -76,13 +85,17 @@ class ProportionalAgent(Agent):
 
 
 class DQNAgent(Agent):
-    def __init__(self, city: City, model_type='gcn', policy_pow=1.0, strategy=1):
-        if strategy == 0:
-            t_name = 'dqn_%s_max' % (model_type)
-        elif strategy == 1:
-            t_name = 'dqn_%s_%.1f' % (model_type, policy_pow)
-        elif strategy == 2:
-            t_name = 'dqn_%s_exp_%.1f' % (model_type, policy_pow)
+    def __init__(self, city: City, model_type='gcn', policy_pow=1.0, strategy=POLICY_POW, consider_speed=True, **kwargs):
+        temperature = kwargs.get("temperature", 1)
+        t_name = 'dqn'
+        if strategy == POLICY_ARGMAX:
+            t_name = t_name + '_%s_max_eps_%s' % (model_type, str(kwargs.get("epsilon_min", 0)))
+        elif strategy == POLICY_POW:
+            t_name = t_name + '_%s_%s' % (model_type, str(policy_pow))
+        elif strategy == POLICY_EXP:
+            t_name = t_name + '_%s_softmax_%s' % (model_type, str(temperature))
+        elif strategy == POLICY_ENTROPY:
+            t_name = t_name + '_%s_entropy_softmax_%s' % (model_type, str(temperature))
         super().__init__(t_name)
 
         # reverse direction & add self loop
@@ -90,6 +103,8 @@ class DQNAgent(Agent):
         for node in newG.nodes():
             newG.add_edge(node, node)
         self.strategy = strategy
+
+        city.consider_speed = consider_speed
 
         if model_type == 'gcn':
             self.model = GCN(newG,
@@ -128,6 +143,15 @@ class DQNAgent(Agent):
         # for memoization
         self.next_target_expected_return_values_valid = np.zeros((self.city.N,), dtype=np.int32)
         self.policy_pow = policy_pow
+        self.do_epsilon_exploration = kwargs.get("do_epsilon_exploration", True)
+        self.temperature = temperature
+
+        if kwargs.get("q_value_debug", False):
+            print("Debug file create")
+            self.debug_file = open("%s/q_value_log_%s.txt" % (kwargs.get("log_save_folder"), self.name), 'w')
+        else:
+            self.debug_file = None
+        self.q_values_saved = None
 
     def save_model(self, save_path):
         print("SAVING")
@@ -170,25 +194,31 @@ class DQNAgent(Agent):
 
                     # (1) controllable agents
                     if driver.road_position + road.speed * self.city.city_time_unit_in_minute > road.length and len(neighbors) > 1:
+                        # (a) never calculated before
                         if self.next_target_expected_return_values_valid[driver.road_index] == -1:
                             # pi(s, t+1)
                             next_target_policy = self.get_policy_from_action_values(next_target_q_values[neighbors].squeeze())
 
                             # sigma pi(s,t+1) Q(s,t+1)
-                            m = torch.dot(next_target_q_values[neighbors].squeeze(), next_target_policy)
+                            next_q_values = next_target_q_values[neighbors].squeeze()
+
+                            if self.strategy == POLICY_ENTROPY:
+                                m = self.temperature * torch.log(torch.sum(torch.exp(next_q_values / self.temperature)))
+                            else:
+                                m = torch.dot(next_q_values, next_target_policy)
 
                             # set result and memorize it.
                             self.next_target_expected_return_values[driver.road_index] = m
                             self.next_target_expected_return_values_valid[driver.road_index] = 1
+                        # (b) just return previously calculated value.
                         else:
-                            # just return before calculated value.
                             m = self.next_target_expected_return_values[driver.road_index]
 
                     # (2) non-controllable agents
                     else:
                         m = next_target_q_values[driver.road_index]
 
-                    target_q_values[driver.road_index] += 0.9 * m
+                    target_q_values[driver.road_index] += self.gamma * m   # gamma = 0.9
                     target_q_values_counts[driver.road_index] += 1
 
             # For some roads, there are no drivers
@@ -232,6 +262,11 @@ class DQNAgent(Agent):
         # Q_V(j, t) = f(s_t)
         q_values = model(observations.cuda())
 
+        #if self.debug_file:
+            #self.q_values_saved = q_values[0:8]
+        #print("Example Q values", self.name, q_values[0:10])
+            #self.debug_file.flush()
+
         for v in range(self.city.N):
             out_nodes = self.city.roads[v].reachable_roads
             if len(out_nodes) == 0:
@@ -248,10 +283,11 @@ class DQNAgent(Agent):
 
     def get_policy_from_action_values(self, q_values: torch.Tensor):
         strategy = self.strategy
-        if strategy == 0:
+        if strategy == POLICY_ARGMAX:
             m = torch.max(q_values)
             p = (q_values == m).float()
-        elif strategy == 1:
+        # Q^policy_pow
+        elif strategy == POLICY_POW:
             if q_values.sum() == 0:
                 p = torch.ones_like(q_values)
                 p = p / p.sum()
@@ -259,14 +295,10 @@ class DQNAgent(Agent):
                 p = q_values / q_values.sum()
             p = p / torch.max(p)
             p = p**self.policy_pow
-        else:
-            # if q_values.sum() == 0:
-            #     p = torch.ones_like(q_values)
-            #     p = p / p.sum()
-            # else:
-            #     p = q_values / q_values.sum()
+        # exp(Q/temperature)
+        elif strategy == POLICY_EXP or strategy == POLICY_ENTROPY:
             q_values_max = torch.max(q_values)
-            p = torch.exp((q_values-q_values_max)*self.policy_pow)
+            p = torch.exp((q_values-q_values_max) / self.temperature)
 
         if torch.isnan(p).any():
             print(q_values.sum())
