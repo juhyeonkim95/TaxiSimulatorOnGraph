@@ -2,7 +2,7 @@
 ![teasure](assets/seoul.png)
 
 This repository is the official implementation of "Optimizing Large-Scale Fleet Management on a Road
-Network using Multi-Agent Deep Reinforcement Learning with Graph Neural Network" by Juhyeon Kim and Kihyun Kim (ITSC 2021 submitted).
+Network using Multi-Agent Deep Reinforcement Learning with Graph Neural Network" by Juhyeon Kim and Kihyun Kim (ITSC 2021).
 
 Because we use the company's data, we will disclose the data after consulting with the company.
 
