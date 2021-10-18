@@ -6,7 +6,7 @@ We upload example data in `data_example` folder to just check data format.
 
 You should use your own data.
 
-There are total 4 files.
+There are total 4 csv files.
 
 - call data : `seoul_call_data_20181023.csv`
 - initial driver distributioin : `seoul_idle_driver_initial_distribution_20181023.csv`
@@ -22,3 +22,8 @@ You can use your own call and drivers data, but you should convert it to osmnx f
 Speed data is a raw data from government's open data set (https://data.seoul.go.kr/). 
 It is written in Korean.
 You can use your own speed data, but again you should match it to osmnx road ids.
+
+There are total 3 road network data (graphml files).
+- `seoul_rectangular_drive_network_original.graphml` : Original road network of Seoul without any simplification (243,621 edges).
+- `seoul_rectangular_drive_network_simplified.graphml` : Simplified road network of Seoul  (13,334 edges).
+- `seoul_rectangular_drive_network_simplified_with_speed.graphml` : Simplified road network of Seoul with speed information. Check `Tutorial_SpeedInfoGenerator.ipynb` for details.
