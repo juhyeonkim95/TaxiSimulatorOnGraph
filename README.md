@@ -29,12 +29,12 @@ pip install dgl-cu102==0.4.3.post2
 ### Real city
 For real city data, following notebook tutorials are available.
 
-(1) preprocessing
+(1) Preprocessing
 - `Tutorial_GraphSimplification.ipynb` performs graph simplification which is required to run simulation 
 with large real data.
 - `Tutorial_SpeedInfoGenerator.ipynb` generates speed information data at each road from raw speed data.
 
-(2) run simulation
+(2) Run Simulation
 - `Tutorial_RealCity.ipynb` runs simulation (both train and evaluate) in Seoul with real call data.
 - `Tutorial_RealCity_Multiprocessing.ipynb` runs simulation (both train and evaluate) using multiprocessing.
 You need multi-GPU environment to run this code.
@@ -46,8 +46,8 @@ We upload example data in `data_example` folder to just check data format.
 **Full data will not be uploaded.**
 
 You should use your own data.
-
 Public data (osmnx road data / speed data) is fully uploaded.
+Please read `README_data.md` in `data_example` folder for the details.
 
 ## Visualization
 
