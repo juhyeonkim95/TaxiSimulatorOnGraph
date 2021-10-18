@@ -4,6 +4,7 @@ import numpy as np
 import copy
 from shapely.geometry import LineString, MultiLineString
 from shapely import ops
+import osmnx.utils_graph
 
 
 def generate_square_multidi_graph(width, height, mean_distance=300, std=100, min_distance=100) ->nx.MultiDiGraph:
@@ -102,7 +103,7 @@ def print_graph_info(G):
 
 
 # Functions for graph simplification
-def simplify_graph_remove_unimportant_roads(G_original: nx.MultiDiGraph):
+def simplify_graph_remove_unimportant_roads(G_original: nx.MultiDiGraph, min_length=1000):
     '''
     Removes all unimportant roads.
     :param G_original: networkx graph object.
@@ -113,14 +114,14 @@ def simplify_graph_remove_unimportant_roads(G_original: nx.MultiDiGraph):
     for e in list(G.edges(data=True, keys=True)):
         u, v, i, info = e
         highway_type = info['highway']
-        if check_highway_type_is_to_be_removed(highway_type) and info['length'] < 1000:
+        if check_highway_type_is_to_be_removed(highway_type) and info['length'] < min_length:
             to_remove.append((u, v, i))
 
     G.remove_edges_from(to_remove)
-    G = ox.remove_isolated_nodes(G)
+    G = osmnx.utils_graph.remove_isolated_nodes(G)
     # print(get_all_types(G))
 
-    G_component = ox.get_largest_component(G, strongly=True)
+    G_component = osmnx.utils_graph.get_largest_component(G, strongly=True)
 
     print_graph_info(G_original)
     print_graph_info(G)

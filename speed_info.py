@@ -6,20 +6,20 @@ class SpeedInfo:
     def __init__(self, file_path, unit_time=60):
         '''
         Speed information for each road.
+        You can use your own speed implementation!
         :param file_path: Path to speed info data.
         :param unit_time: Default is 60. We will use linear interpolation for intermediate values.
         '''
         data = pd.read_csv(file_path, encoding='euc-kr')
         d = data.drop(columns=['일자', '링크아이디', '거리', '차선수']).groupby('도로명')
-        #print(data)
-        speed_mean = d.mean()#.agg(['mean', 'std'])
-        #print(speed_mean)
-        speed_std = d.std()#d.agg(['std'])
+        speed_mean = d.mean()
+        speed_std = d.std()
         road_names = speed_mean.index
 
         speed_mean = speed_mean.values
         speed_std = speed_std.values
 
+        # set nan data
         speed_mean[np.isnan(speed_mean)] = 24
         speed_std[np.isnan(speed_std)] = 4
 
@@ -35,6 +35,11 @@ class SpeedInfo:
         self.max_time = 24
 
     def set_speed(self, city):
+        """
+        Set speed information to city's current time.
+        :param city:
+        :return:
+        """
         k1 = city.city_time // self.unit_time
         k2 = k1 + 1
         r = (city.city_time / self.unit_time) - k1
@@ -42,6 +47,7 @@ class SpeedInfo:
         k1 = k1 % self.max_time
         k2 = k2 % self.max_time
 
+        # use linear interpolation.
         lerped_mean = self.speed_mean[:,k1] * (1 - r) + self.speed_mean[:,k2] * r
         lerped_std = self.speed_std[:,k1] * (1 - r) + self.speed_std[:,k2] * r
 

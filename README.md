@@ -1,10 +1,8 @@
 # TaxiSimulatorOnGraph
 ![teasure](assets/seoul.png)
 
-This repository is the official implementation of "Optimizing Large-Scale Fleet Management on a Road
-Network using Multi-Agent Deep Reinforcement Learning with Graph Neural Network" by Juhyeon Kim and Kihyun Kim (ITSC 2021).
-
-Because we use the company's data, we will disclose the data after consulting with the company.
+This repository is the official implementation of ["Optimizing Large-Scale Fleet Management on a Road
+Network using Multi-Agent Deep Reinforcement Learning with Graph Neural Network"](https://arxiv.org/abs/2011.06175) by Juhyeon Kim and Kihyun Kim (ITSC 2021).
 
 ## Requirements
 
@@ -25,14 +23,31 @@ pip install dgl-cu102==0.4.3.post2
 ```
 
 ## Training and Evaluation
+### 10 by 10 grid city
+`Tutorial_10by10GridCity.ipynb` runs a simulation on simple 10 by 10 grid-shaped city.
 
-Since real data is not uploaded, only simple grid city case is runnable.
-See the jupyter notebook code example for both training and evaluation.
-- `Tutorial_10by10GridCity.ipynb` runs simulation in simple 10 by 10 grid city.
+### Real city
+For real city data, following notebook tutorials are available.
+
+(1) preprocessing
 - `Tutorial_GraphSimplification.ipynb` performs graph simplification which is required to run simulation 
-with large real data (`Tutorial_RealCity.ipynb`).
-- `Tutorial_RealCity.ipynb` runs simulation in Seoul with real call data. 
-As mentioned before, because data has not been uploaded, you cannot run this code right now.
+with large real data.
+- `Tutorial_SpeedInfoGenerator.ipynb` generates speed information data at each road from raw speed data.
+
+(2) run simulation
+- `Tutorial_RealCity.ipynb` runs simulation (both train and evaluate) in Seoul with real call data.
+- `Tutorial_RealCity_Multiprocessing.ipynb` runs simulation (both train and evaluate) using multiprocessing.
+You need multi-GPU environment to run this code.
+
+## Data
+The data was provided from *Kakao mobility*, South Korea.
+We upload example data in `data_example` folder to just check data format.
+
+**Full data will not be uploaded.**
+
+You should use your own data.
+
+Public data (osmnx road data / speed data) is fully uploaded.
 
 ## Visualization
 
