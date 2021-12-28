@@ -56,3 +56,15 @@ Following is the video that shows Q values of roads in Seoul at each time stamp 
 Note that red means higher value and green means lower value.
 
 ![visualization](assets/teasure.gif)
+
+## Citation
+```
+@inproceedings{kim2021optimizing,
+  title={Optimizing large-scale fleet management on a road network using multi-agent deep reinforcement learning with graph neural network},
+  author={Kim, Juhyeon and Kim, Kihyun},
+  booktitle={2021 IEEE International Intelligent Transportation Systems Conference (ITSC)},
+  pages={990--995},
+  year={2021},
+  organization={IEEE}
+}
+```
