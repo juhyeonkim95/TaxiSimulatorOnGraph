@@ -58,6 +58,7 @@ Note that red means higher value and green means lower value.
 ![visualization](assets/teasure.gif)
 
 ## Citation
+If you find this useful for your research, please please consider to cite:
 ```
 @inproceedings{kim2021optimizing,
   title={Optimizing large-scale fleet management on a road network using multi-agent deep reinforcement learning with graph neural network},
