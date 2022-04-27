@@ -7,8 +7,8 @@ Network using Multi-Agent Deep Reinforcement Learning with Graph Neural Network"
 ## Requirements
 
 We use [Deep Graph Library](https://github.com/dmlc/dgl) (DGL)
-and [OSMnx](https://github.com/gboeing/osmnx) to handle road network.
-For backend of DGL, we use PyTorch.
+and [OSMnx](https://github.com/gboeing/osmnx) to handle a road network.
+For the backend of DGL, we use PyTorch.
 
 To install all of the requirements:
 
@@ -58,7 +58,7 @@ Note that red means higher value and green means lower value.
 ![visualization](assets/teasure.gif)
 
 ## Citation
-If you find this useful for your research, please please consider to cite:
+If you find this useful for your research, please consider to cite:
 ```
 @inproceedings{kim2021optimizing,
   title={Optimizing large-scale fleet management on a road network using multi-agent deep reinforcement learning with graph neural network},
